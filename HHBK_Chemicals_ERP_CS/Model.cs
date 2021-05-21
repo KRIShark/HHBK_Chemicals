@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
@@ -38,6 +39,8 @@ namespace HHBK_Chemicals_ERP_CS
         private MySqlConnection conn;
         private MySqlCommand mycommand;
 
+        private List<Produkt> produkte=new List<Produkt>();
+
         public Model()
         {
             conn = new MySqlConnection(myConnectionString);
@@ -68,17 +71,10 @@ namespace HHBK_Chemicals_ERP_CS
         IView IModel.IView { set => this.view=value; }
         IController IModel.IController1 { set => this.controller=value; }
 
-        public Kunde getKunde()
+        List<Kunde> IModel.getKunden()
         {
-            Kunde kunde1 = null;
-            int kundennummer=0;
-            string name="NN";
-            string vorname="NN";
-            string strasse="NN";
-            string hausnummer="NN";
-            string ort="NN";
-            int postleitzahl=0;
-            string emailadresse="NN";
+            Kunde kunde1 = new Kunde();
+            List<Kunde> kundenliste = new List<Kunde>(); 
 
 
            
@@ -91,20 +87,23 @@ namespace HHBK_Chemicals_ERP_CS
             
             while (reader.Read())
             {
-                kundennummer    = Convert.ToInt32(reader["kundennummer"]);
-                name         = reader["name"].ToString();
-                vorname      = reader["vorname"].ToString();
-                strasse = reader["strasse"].ToString();
-                hausnummer = reader["hausnummer"].ToString();
-                ort = reader["ort"].ToString();
-                postleitzahl    = Convert.ToInt32(reader["postleitzahl"]);
-                emailadresse = reader["emailadresse"].ToString();
+                kunde1.Kundennummer    = Convert.ToInt32(reader["kundennummer"]);
+                kunde1.Name         = reader["name"].ToString();
+                kunde1.Vorname      = reader["vorname"].ToString();
+                kunde1.Strasse = reader["strasse"].ToString();
+                kunde1.Hausnummer = reader["hausnummer"].ToString();
+                kunde1.Ort = reader["ort"].ToString();
+                kunde1.Postleitzahl    = Convert.ToInt32(reader["postleitzahl"]);
+                kunde1.Emailadresse = reader["emailadresse"].ToString();
+
+                kundenliste.Add(kunde1);
+
             }
             reader.Close();
             conn.Close();
-            kunde1 = new Kunde(kundennummer, name, vorname, strasse, hausnummer, ort, postleitzahl, emailadresse);
+            //kunde1 = new Kunde(kundennummer, name, vorname, strasse, hausnummer, ort, postleitzahl, emailadresse);
 
-            return kunde1;
+            return kundenliste;
         }
 
 
@@ -115,7 +114,40 @@ namespace HHBK_Chemicals_ERP_CS
 
         void IModel.aendern(Produkt produkt)
         {
-            throw new NotImplementedException();
+            mycommand.CommandText = Commands.change(produkt);
+
+            conn.Open();
+            try
+            {
+                mycommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        void IModel.loeschen(Produkt produkt)
+        {
+           mycommand.CommandText = Commands.delete(produkt);
+
+            conn.Open();
+            try
+            {
+                mycommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
 
         void IModel.bestellungSpeichern(List<Bestellposition> bestellung)
@@ -125,10 +157,57 @@ namespace HHBK_Chemicals_ERP_CS
 
         void IModel.createDB()
         {
-            throw new NotImplementedException();
+            try
+            {
+                conn.ConnectionString = "server=127.0.0.1;uid=root;pwd=;";
+                mycommand.CommandText = Commands.CreateDatabase;
+
+                conn.Open();
+                mycommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+
+                //return false;
+            }
+            finally
+            {
+                conn.Close();
+                conn.ConnectionString = myConnectionString;
+            }
+
+            //return true;
+
         }
 
-        
+       
+
+        bool IModel.createTestData()
+        {
+            try
+            {
+                mycommand.CommandText = Commands.CreateTestdata;
+
+                conn.Open();
+                mycommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.Message);
+
+                return false;
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return true;
+
+        }
+
+
 
         Lieferposition IModel.GetLieferposition(int idLieferposition)
         {
@@ -140,10 +219,7 @@ namespace HHBK_Chemicals_ERP_CS
             throw new NotImplementedException();
         }
 
-        void IModel.loeschen(Produkt produkt)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         void IModel.speichern(Kunde kunde)
         {
@@ -193,5 +269,39 @@ namespace HHBK_Chemicals_ERP_CS
             Kunde kunde1 = null;
             //return kunde1;
         }
+
+        List<Produkt> IModel.getProdukte()
+        {
+           mycommand.CommandText = Commands.GetProduktIDandName;
+
+           produkte.Clear();
+
+            
+
+            conn.Open();
+
+            MySqlDataReader reader = mycommand.ExecuteReader();
+            
+            while (reader.Read())
+            {
+                Produkt p = new Produkt();
+                p.Artikelnummer = Convert.ToInt32(reader["Artikelnummer"]);
+                p.Artikelname = reader["Artikelname"].ToString();
+                p.Verkaufseinheit = Convert.ToInt32(reader["Verkaufseinheit"]);
+                p.Einheit = reader["Einheit"].ToString();
+                p.PreisVK = Convert.ToDouble(reader["PreisVK"]);
+                p.ChemischeBezeichnung = reader["ChemischeBezeichnung"].ToString();
+               
+                produkte.Add(p);
+            }
+
+
+
+            conn.Close();
+            return produkte;
+
+        }
+
+       
     }
 }
