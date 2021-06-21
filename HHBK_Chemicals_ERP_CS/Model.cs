@@ -40,6 +40,7 @@ namespace HHBK_Chemicals_ERP_CS
         private MySqlCommand mycommand;
 
         private List<Produkt> produkte=new List<Produkt>();
+        private List<Kunde> kunden = new List<Kunde>();
 
         public Model()
         {
@@ -76,9 +77,6 @@ namespace HHBK_Chemicals_ERP_CS
             Kunde kunde1 = new Kunde();
             List<Kunde> kundenliste = new List<Kunde>(); 
 
-
-           
-           
             mycommand.CommandText = "Select * from kunde";
             
             conn.Open();
@@ -107,14 +105,17 @@ namespace HHBK_Chemicals_ERP_CS
         }
 
 
-        void IModel.aendern(Kunde kunde)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         void IModel.aendern(Produkt produkt)
         {
-            mycommand.CommandText = Commands.change(produkt);
+            if (produkt.Artikelnummer != -1)
+                mycommand.CommandText = Commands.change(produkt);
+            else
+                mycommand.CommandText = Commands.newEntity(produkt);
+
+            MessageBox.Show(mycommand.CommandText);
+
 
             conn.Open();
             try
@@ -129,6 +130,10 @@ namespace HHBK_Chemicals_ERP_CS
             {
                 conn.Close();
             }
+
+            //Über Event lösen!
+            IModel a = this;
+            view.Show(a.getProdukte());
         }
 
         void IModel.loeschen(Produkt produkt)
@@ -153,7 +158,27 @@ namespace HHBK_Chemicals_ERP_CS
 
         void IModel.bestellungSpeichern(List<Bestellposition> bestellung)
         {
-            throw new NotImplementedException();
+            try
+            {
+                conn.Open();
+                foreach (Bestellposition bestellposition in bestellung)
+                {
+                    mycommand.CommandText = Commands.newEntity(bestellposition);
+                    mycommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.Message);
+
+                
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            
         }
 
         void IModel.createDB()
@@ -215,6 +240,35 @@ namespace HHBK_Chemicals_ERP_CS
             throw new NotImplementedException();
         }
 
+        void IModel.aendern(Kunde kunde)
+        {
+            if (kunde.Kundennummer != -1)
+                mycommand.CommandText = Commands.change(kunde);
+            else
+                mycommand.CommandText = Commands.newEntity(kunde);
+
+            MessageBox.Show(mycommand.CommandText);
+
+
+            conn.Open();
+            try
+            {
+                mycommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            //Über Event lösen!
+            
+            IModel a = this;
+            view.Show(a.getKunden());
+        }
         void IModel.loeschen(Kunde kunde)
         {
             throw new NotImplementedException();
@@ -303,6 +357,46 @@ namespace HHBK_Chemicals_ERP_CS
 
         }
 
-       
+        List<Bestellung> IModel.getBestellungen()
+        {
+           
+            List<Bestellung> bestellungen = new List<Bestellung>();
+
+            mycommand.CommandText = "SELECT * FROM bestellposition";
+
+            conn.Open();
+
+            MySqlDataReader reader = mycommand.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Bestellung bestellung1 = new Bestellung();
+                bestellung1.Bestellpositionsnummer = Convert.ToInt32(reader["Bestellpositionsnummer"].ToString());
+                bestellung1.Bestellungsnummer = Convert.ToInt32(reader["Bestellungsnummer"].ToString());
+                bestellung1.Menge = Convert.ToInt32(reader["Menge"].ToString());
+                //bestellung1.Bestelldatum =Convert.ToDateTime(reader["Bestelldatum"].ToString());
+                bestellung1.Produkt.Artikelnummer = Convert.ToInt32(reader["Artikelnummer"].ToString());
+                bestellung1.Kunde.Kundennummer = Convert.ToInt32(reader["Kundennummer"].ToString());
+                if(int.TryParse(reader["Lieferpositionsnummer"].ToString(), out int result))
+                  bestellung1.Lieferung.IdLieferposition = result;
+
+                bestellungen.Add(bestellung1);
+
+            }
+            reader.Close();
+            conn.Close();
+            
+            return bestellungen;
+        }
+
+        List<Lagerposition> IModel.getLagerpositionen()
+        {
+            throw new NotImplementedException();
+        }
+
+        List<Bestellung> IModel.getLieferungen()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -15,8 +15,37 @@ namespace HHBK_Chemicals_ERP_CS
         private List<Produkt> produktliste=null;
         private Produkt produkt = new Produkt();
 
-        internal List<Produkt> Produktliste {get => produktliste; set =>produktliste = value;}
-        internal Produkt Produkt { get => produkt; set => produkt = value; }
+        internal List<Produkt> Produktliste
+        {
+            get => produktliste;
+            set
+            {
+                produktliste = value;
+
+                if (produktliste != null)
+                {
+                    comboBoxArtikelnummer.Items.Clear();
+                    comboBoxArtikelname.Items.Clear();
+
+
+                    foreach (Produkt p in produktliste)
+                    {
+                        comboBoxArtikelnummer.Items.Add(p.Artikelnummer.ToString());
+                        comboBoxArtikelname.Items.Add(p.Artikelname.ToString());
+                    }
+                }
+            }
+        }
+        internal Produkt Produkt
+        {
+            get => produkt;
+            set
+            {
+                produkt = value;
+
+
+            }
+        }
 
         public event EventHandler UCProduktVerwaltenAendern;
         public event EventHandler UCProduktVerwaltenLoeschen;
@@ -40,21 +69,30 @@ namespace HHBK_Chemicals_ERP_CS
 
         private void buttonNeu_Click(object sender, EventArgs e)
         {
-            comboBoxArtikelname.Items.Clear();
-            comboBoxArtikelnummer.Items.Clear();
+            comboBoxArtikelnummer.Enabled = false;
+            comboBoxArtikelname.Text="";
+            comboBoxArtikelnummer.Text="";
             textBoxVerkaufseinheit.Text = "";
             textBoxEinheit.Text = "";
             textBoxPreisVK.Text = "";
+            buttonAendern.Text = "speichern";
         }
 
         private void buttonAendern_Click(object sender, EventArgs e)
         {
-            Produkt.Artikelnummer = Convert.ToInt32(comboBoxArtikelnummer.SelectedItem.ToString());
-            Produkt.Artikelname= comboBoxArtikelname.SelectedItem.ToString();
+            if(buttonAendern.Text=="ändern")
+                Produkt.Artikelnummer = Convert.ToInt32(comboBoxArtikelnummer.SelectedItem.ToString());
+            else if (buttonAendern.Text == "speichern")
+                Produkt.Artikelnummer = -1;
+            Produkt.Artikelname= comboBoxArtikelname.Text;
             Produkt.PreisVK= Convert.ToDouble(textBoxPreisVK.Text);
             Produkt.Verkaufseinheit = Convert.ToInt32(textBoxVerkaufseinheit.Text);
             Produkt.Einheit = textBoxEinheit.Text;
             Produkt.ChemischeBezeichnung = textBoxChemischeBezeichnung.Text;
+
+            buttonAendern.Text = "ändern";
+            comboBoxArtikelnummer.Enabled = true;
+            //MessageBox.Show(Produkt.Artikelname + " " + produkt.ChemischeBezeichnung);
 
             OnUCProduktVerwaltenAendern(this, e);
 
@@ -80,6 +118,23 @@ namespace HHBK_Chemicals_ERP_CS
                 comboBoxArtikelnummer.Items.Clear();
                
             
+                foreach (Produkt p in produktliste)
+                {
+                    comboBoxArtikelnummer.Items.Add(p.Artikelnummer.ToString());
+                    comboBoxArtikelname.Items.Add(p.Artikelname.ToString());
+                }
+            }
+        }
+        //Event abfragen statt public!
+        public void FillCombos()
+        {
+
+            if (produktliste != null)
+            {
+                comboBoxArtikelnummer.Items.Clear();
+                comboBoxArtikelname.Items.Clear();
+
+
                 foreach (Produkt p in produktliste)
                 {
                     comboBoxArtikelnummer.Items.Add(p.Artikelnummer.ToString());

@@ -21,7 +21,7 @@ namespace HHBK_Chemicals_ERP_CS
             "`Hausnummer` INT NULL, " +
             "`Postleitzahl` INT NULL, " +
             "`Ort` VARCHAR(45) NULL, " +
-            "`emaliadresse` VARCHAR(45) NULL, " +
+            "`emailadresse` VARCHAR(45) NULL, " +
             "`passwort` VARCHAR(45) NULL, " +
             "PRIMARY KEY(`Kundennummer`)) " +
             "ENGINE = InnoDB; " +
@@ -184,6 +184,14 @@ namespace HHBK_Chemicals_ERP_CS
             "ADD FOREIGN KEY (`Rezeptnummer`) " +
             "REFERENCES `Rezept` (`Rezeptnummer`) " +
             "ON DELETE NO ACTION ON UPDATE NO ACTION;";
+            
+            /*
+            +
+            "CREATE USER 'erpModel'@'localhost' IDENTIFIED VIA mysql_native_password USING '555HHBK';"+
+            "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, FILE, INDEX, ALTER, CREATE TEMPORARY TABLES,"+
+            "CREATE VIEW, EVENT, TRIGGER, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EXECUTE ON*.* TO 'erpModel'@'localhost'"+
+            "REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;";
+            */
         public static String CreateDatabase { get => createDatabase; }
 
         private static String createTestdata =
@@ -254,11 +262,43 @@ namespace HHBK_Chemicals_ERP_CS
 
         private static String getProduktIDandName = "SELECT * FROM produkt";
 
+        public static string newEntity(Produkt p)
+        {
+            /*
+            MessageBox.Show("UPDATE produkt SET " +
+                "artikelname='" + p.Artikelname +"', "+
+                "verkaufseinheit='" + p.Verkaufseinheit + "', "+
+                "einheit='" + p.Einheit + "', "+
+                "preisVK='" + p.PreisVK + "', "+
+                "chemischeBezeichnung='" +p.ChemischeBezeichnung + "' "+
+                "WHERE artikelnummer='" + p.Artikelnummer + "';");
+            */
+            return "INSERT INTO produkt VALUES( "+
+                "NULL, '"+
+                p.Artikelname + "', '" +
+                p.Verkaufseinheit + "', '" +
+                p.Einheit + "', '" +
+                p.PreisVK + "', '" +
+                p.ChemischeBezeichnung + "'); ";
+        }
         public static string change(Produkt p)
         {
-            MessageBox.Show("Uuups... \n Query zum Produktändern fehlt!");
-
-            return "                     ";
+            /*
+            MessageBox.Show("UPDATE produkt SET " +
+                "artikelname='" + p.Artikelname +"', "+
+                "verkaufseinheit='" + p.Verkaufseinheit + "', "+
+                "einheit='" + p.Einheit + "', "+
+                "preisVK='" + p.PreisVK + "', "+
+                "chemischeBezeichnung='" +p.ChemischeBezeichnung + "' "+
+                "WHERE artikelnummer='" + p.Artikelnummer + "';");
+            */
+            return "UPDATE produkt SET " +
+                "artikelname='" + p.Artikelname + "', " +
+                "verkaufseinheit='" + p.Verkaufseinheit + "', " +
+                "einheit='" + p.Einheit + "', " +
+                "preisVK='" + p.PreisVK + "', " +
+                "chemischeBezeichnung='" + p.ChemischeBezeichnung + "' " +
+                "WHERE artikelnummer='" + p.Artikelnummer + "';";            
         }
 
         public static string delete(Produkt p)
@@ -268,6 +308,45 @@ namespace HHBK_Chemicals_ERP_CS
             return "DELETE from produkt WHERE artikelnummer="+p.Artikelnummer+";";
         }
 
+        
+        public static string newEntity(Kunde k)
+        {
+            /*return "INSERT INTO produkt VALUES( " +
+                "NULL, '" +
+                p.Artikelname + "', '" +
+                p.Verkaufseinheit + "', '" +
+                p.Einheit + "', '" +
+                p.PreisVK + "', '" +
+                p.ChemischeBezeichnung + "'); ";
+            */
+            return "Null";
+        }
+        public static string change(Kunde k)
+        {
 
+            /*
+            return "UPDATE produkt SET " +
+                "artikelname='" + p.Artikelname + "', " +
+                "verkaufseinheit='" + p.Verkaufseinheit + "', " +
+                "einheit='" + p.Einheit + "', " +
+                "preisVK='" + p.PreisVK + "', " +
+                "chemischeBezeichnung='" + p.ChemischeBezeichnung + "' " +
+                "WHERE artikelnummer='" + p.Artikelnummer + "';";
+            */
+            return "Null";
+        }
+
+        public static string delete(Kunde k)
+        {
+            /*
+            return "DELETE from produkt WHERE artikelnummer=" + p.Artikelnummer + ";";
+            */
+            return "Null";
+        }
+    
+        public static string newEntity(Bestellposition b)
+        {
+            return "INSERT ";
+        }
     }
 }

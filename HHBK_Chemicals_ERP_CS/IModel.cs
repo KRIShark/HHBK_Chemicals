@@ -37,10 +37,13 @@ namespace HHBK_Chemicals_ERP_CS
         List<Kunde> getKunden();
 
         List<Produkt> getProdukte();
-       
 
+        List<Bestellung> getBestellungen();
+
+        List<Lagerposition> getLagerpositionen();
         Lieferposition GetLieferposition(int idLieferposition);
 
+        List<Bestellung> getLieferungen();
 
         void speichern(Kunde kunde);
         void speichern(Produkt produkt);

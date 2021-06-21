@@ -10,17 +10,11 @@ using System.Windows.Forms;
 
 namespace HHBK_Chemicals_ERP_CS
 {
-    public partial class ViewKunde : Form, IViewKunde
+    public partial class UserControlRezeptverwaltung : UserControl
     {
-        private IModel model;
-        private IControllerKunde controllerKunde;
-        IModel IViewKunde.IModel1 { set => this.model=value; }
-        IControllerKunde IViewKunde.IControllerKunde1 { set => this.controllerKunde=value; }
-
-        public ViewKunde()
+        public UserControlRezeptverwaltung()
         {
             InitializeComponent();
         }
-
     }
 }
